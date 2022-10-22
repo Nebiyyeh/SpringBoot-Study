@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.neb.domain.Student;
+import com.neb.dto.StudentDTO;
+import com.neb.exception.ConflictException;
 import com.neb.exception.ResourceNotFound;
 import com.neb.repository.StudentRepository;
 
@@ -29,7 +31,21 @@ public class StudentServiceImp implements StudentService{
 	}
 
 	@Override
-	public void saveStudent(Student student) {
+	public void saveStudent(StudentDTO studentDTO) {
+   
+		boolean exists=existsByEmail(studentDTO.getEmail());
+		
+		if(exists) {
+			throw new ConflictException("This email already exists!");
+		}
+		
+		Student student=new Student();
+		student.setFirstName(studentDTO.getFirstName());
+		student.setLastName(studentDTO.getLastName());
+		student.setGrade(studentDTO.getGrade());
+		student.setPhone(studentDTO.getPhone());
+		student.setEmail(studentDTO.getEmail());
+		
 		stdrepo.save(student);
 	}
 
@@ -41,19 +57,31 @@ public class StudentServiceImp implements StudentService{
 	}
 
 	@Override
-	public void updateStudent(Long id, Student student) {
+	public void updateStudent(Long id, StudentDTO studentDTO) {
 		Student foundStudent=getStudentById(id);
-		foundStudent.setFName(student.getFName());
-		foundStudent.setLName(student.getLName());
-		foundStudent.setGrade(student.getGrade());
-		foundStudent.setPhone(student.getPhone());
 		
-		//foundStudent.setEmail(student.getEmail());
-		// we defined email unique, so should check before updating
+		boolean exists=existsByEmail(studentDTO.getEmail());
+		
+		if(exists&&!studentDTO.getEmail().equals(foundStudent.getEmail())) {
+			throw new ConflictException("This email already exists!");
+		}
+		
+		foundStudent.setFirstName(studentDTO.getFirstName());
+		foundStudent.setLastName(studentDTO.getLastName());
+		foundStudent.setGrade(studentDTO.getGrade());
+		foundStudent.setPhone(studentDTO.getPhone());
+		foundStudent.setEmail(studentDTO.getEmail());
+		
+		// email is defined unique, so should check before updating
 		
 		stdrepo.save(foundStudent);
 		
-		
+	}
+
+	@Override
+	public boolean existsByEmail(String email) {
+	
+		return stdrepo.existsByEmail(email);
 	}
 
 }

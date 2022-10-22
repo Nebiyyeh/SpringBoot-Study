@@ -8,4 +8,7 @@ import com.neb.domain.Student;
 @Repository   // optional if extending the JPA
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
+	Boolean existsByEmail(String email);
+	
+	
 }
