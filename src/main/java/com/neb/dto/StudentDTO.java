@@ -7,6 +7,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.neb.domain.Student;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,5 +40,14 @@ public class StudentDTO {
 	
 	@Email(message = "Please provide a valid email")  
 	private String email;
+	
+	public StudentDTO(Student student) {
+		this.firstName=student.getFirstName();
+		this.lastName=student.getLastName();
+		this.grade=student.getGrade();
+		this.phone=student.getPhone();
+		this.email=student.getEmail();
+	}
+	
 
 }

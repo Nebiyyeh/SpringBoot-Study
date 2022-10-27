@@ -8,6 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,10 +26,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.neb.domain.Student;
+import com.neb.dto.StudentBookDTO;
 import com.neb.dto.StudentDTO;
 import com.neb.exception.ConflictException;
 import com.neb.service.StudentService;
 
+import io.micrometer.core.ipc.http.HttpSender.Response;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -103,10 +110,71 @@ public class StudentController {
 		Map<String, String> map=new HashMap<>();
 		map.put("doesEmailExist", exists.toString());
 	
-		
 		return ResponseEntity.ok(map);
+	}
+//	
+	@GetMapping("/pages")
+	public ResponseEntity<Page<Student>> getStudentPage(@RequestParam("page") int page, @RequestParam("size") int size,
+			@RequestParam("sort") String prop, @RequestParam(value="direction", required=false, defaultValue="DESC" ) Direction direction ){
+		 
+		Pageable pageable= PageRequest.of(page, size, Sort.by(direction, prop));
+		
+		Page<Student> studentPage= stdService.getStudentPage(pageable);
+		
+		return ResponseEntity.ok(studentPage);
+	}
+	
+	//http://localhost:8080/student/grade/11
+	@GetMapping("grade/{grade}")
+	public ResponseEntity<List<Student>> getStudentsEqualsGrade(@PathVariable("grade") Integer grade ){
+		List<Student> students=stdService.findAllEqualsGrade(grade);
+		return ResponseEntity.ok(students);
 	}
 	
 	
-
+	//http://localhost:8080/student/grade?grade=12
+	@GetMapping("grade")
+	public ResponseEntity<List<Student>> getStudentsEqualsGradeWithQuery(@RequestParam("grade") Integer grade ){
+		List<Student> students=stdService.findAllEqualsGrade(grade);
+		return ResponseEntity.ok(students);
+	}
+	
+	@GetMapping("/dto")
+	public ResponseEntity<StudentDTO> getStudentDTO(@RequestParam("id") Long id){
+		StudentDTO stdDTO= stdService.findStudentDTOById(id);
+		return ResponseEntity.ok(stdDTO);
+	}
+	
+	@GetMapping("/list")
+	public ResponseEntity<List<Student>> getStudents(){
+		List<Student> allStd=stdService.getStudents();
+		return ResponseEntity.ok(allStd);
+	}
+	
+	@GetMapping("/list/dto")
+	public ResponseEntity<List<StudentDTO>> getStudentDTOList(){
+		List<StudentDTO> stdDTOList= stdService.getStudentDTOs();
+		return ResponseEntity.ok(stdDTOList);
+		}
+	
+	
+	@GetMapping("/studentbook")
+	public ResponseEntity<List<StudentBookDTO>> getStudentBookDTOs(){
+		List<StudentBookDTO> stdBookDTOList= stdService.getStudentBookDTO();
+		return ResponseEntity.ok(stdBookDTOList);
+		}
+	
+	@GetMapping("/studentbook/pages")
+	public ResponseEntity<Page<StudentBookDTO>> getStudentBookDTOPage(@RequestParam("page") int page, @RequestParam("size") int size,
+			@RequestParam(value="sort") String prop, @RequestParam(value="direction", required=false, defaultValue="DESC" ) Direction direction ){
+		 
+		Pageable pageable= PageRequest.of(page, size, Sort.by(direction, prop));
+		
+		Page<StudentBookDTO> studentBookDTOPage= stdService.getstdBookDTOPage(pageable);
+		
+		return ResponseEntity.ok(studentBookDTOPage);
+		
+	}
 }
+	
+	
