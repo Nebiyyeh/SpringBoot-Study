@@ -25,6 +25,11 @@ spring:
    database-platform: org.hibernate.dialect.PostgreSQLDialect
    properties:
     '[hibernate.format_sql]': true
+    
+ security:
+  user:
+   name: nebiyyeh
+   password: nebiyyeh
  
 logging:
  file:

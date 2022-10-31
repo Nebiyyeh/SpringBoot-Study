@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,6 +52,7 @@ public class StudentController {
 		return "Welcome to the Student Controller via " + servletRequest.getServletPath();
 	}
 	
+	@PreAuthorize("hasRole('INSTRUCTOR')")
 	@PostMapping
 	public ResponseEntity<Map<String, String>> createStudent(@Valid @RequestBody StudentDTO studentDTO){
 		stdService.saveStudent(studentDTO);
